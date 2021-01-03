@@ -25,6 +25,8 @@ public class MainController {
     private String brokeTag;
     @Value("${giphy.zero}")
     private String whatTag;
+    @Value("${giphy.error}")
+    private String errorTag;
 
     @Autowired
     public MainController(
@@ -72,9 +74,13 @@ public class MainController {
                 result = gifService.getGif(this.brokeTag);
                 result.getBody().put("compareResult", this.brokeTag);
                 break;
-            default:
+            case 0:
                 result = gifService.getGif(this.whatTag);
                 result.getBody().put("compareResult", this.whatTag);
+                break;
+            default:
+                result = gifService.getGif(this.errorTag);
+                result.getBody().put("compareResult", this.errorTag);
                 break;
         }
         return result;

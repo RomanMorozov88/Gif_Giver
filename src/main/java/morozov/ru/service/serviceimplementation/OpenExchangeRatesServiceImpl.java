@@ -72,7 +72,7 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
         Double currentCoefficient = this.getCoefficient(this.currentRates, charCode);
         return prevCoefficient != null && currentCoefficient != null
                 ? Double.compare(currentCoefficient, prevCoefficient)
-                : 0;
+                : -101;
     }
 
     /**
