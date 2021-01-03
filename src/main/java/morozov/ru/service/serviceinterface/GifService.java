@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
-public interface GiphyService {
+public interface GifService {
 
     ResponseEntity<Map> getGif(String tag);
 }

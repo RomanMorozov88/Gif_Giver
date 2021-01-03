@@ -1,7 +1,7 @@
 package morozov.ru.controller;
 
-import morozov.ru.service.serviceinterface.GiphyService;
-import morozov.ru.service.serviceinterface.OpenExchangeRatesService;
+import morozov.ru.service.serviceinterface.GifService;
+import morozov.ru.service.serviceinterface.ExchangeRatesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +17,8 @@ import java.util.Map;
 @RequestMapping("/gg")
 public class MainController {
 
-    private OpenExchangeRatesService openExchangeRatesService;
-    private GiphyService giphyService;
+    private ExchangeRatesService exchangeRatesService;
+    private GifService gifService;
     @Value("${giphy.rich}")
     private String richTag;
     @Value("${giphy.broke}")
@@ -28,11 +28,11 @@ public class MainController {
 
     @Autowired
     public MainController(
-            OpenExchangeRatesService openExchangeRatesService,
-            GiphyService giphyService
+            ExchangeRatesService exchangeRatesService,
+            GifService gifService
     ) {
-        this.openExchangeRatesService = openExchangeRatesService;
-        this.giphyService = giphyService;
+        this.exchangeRatesService = exchangeRatesService;
+        this.gifService = gifService;
     }
 
     /**
@@ -42,12 +42,16 @@ public class MainController {
      */
     @GetMapping("/getcodes")
     public List<String> getCharCodes() {
-        return openExchangeRatesService.getCharCodes();
+        return exchangeRatesService.getCharCodes();
     }
 
     /**
      * Получает гифку для отправки клиенту
      * исходя из резултата сравнения курса в openExchangeRatesService
+     * Ответ от Giphy.com просто перекидывается клиенту
+     * в виде ResponseEntity
+     * лишь с небольшой модификацией- добавляется compareResult
+     * для удобства визуальной проверки результата.
      *
      * @param code
      * @return
@@ -55,15 +59,22 @@ public class MainController {
     @GetMapping("/getgif/{code}")
     public ResponseEntity<Map> getGif(@PathVariable String code) {
         ResponseEntity<Map> result = null;
-        switch (openExchangeRatesService.getKeyForTag(code)) {
+        int gifKey = 0;
+        if (code != null) {
+            gifKey = exchangeRatesService.getKeyForTag(code);
+        }
+        switch (gifKey) {
             case 1:
-                result = giphyService.getGif(this.richTag);
+                result = gifService.getGif(this.richTag);
+                result.getBody().put("compareResult", this.richTag);
                 break;
             case -1:
-                result = giphyService.getGif(this.brokeTag);
+                result = gifService.getGif(this.brokeTag);
+                result.getBody().put("compareResult", this.brokeTag);
                 break;
             default:
-                result = giphyService.getGif(this.whatTag);
+                result = gifService.getGif(this.whatTag);
+                result.getBody().put("compareResult", this.whatTag);
                 break;
         }
         return result;
