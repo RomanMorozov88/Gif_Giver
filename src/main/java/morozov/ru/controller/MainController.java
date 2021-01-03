@@ -19,8 +19,6 @@ public class MainController {
 
     private OpenExchangeRatesService openExchangeRatesService;
     private GiphyService giphyService;
-    @Value("${giphy.api.key}")
-    private String apiKey;
     @Value("${giphy.rich}")
     private String richTag;
     @Value("${giphy.broke}")
@@ -64,7 +62,7 @@ public class MainController {
             case -1:
                 result = giphyService.getGif(this.brokeTag);
                 break;
-            case 0:
+            default:
                 result = giphyService.getGif(this.whatTag);
                 break;
         }

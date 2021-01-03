@@ -10,8 +10,9 @@ import java.util.Map;
  * Feign клиент для получения рандомной гифки от giphy.com
  */
 @org.springframework.cloud.openfeign.FeignClient(name = "giphyClient", url = "${giphy.url.general}")
-public interface FeignClient {
+public interface FeignGiphyClient extends GiphyClient {
 
+    @Override
     @GetMapping("/random")
     ResponseEntity<Map> getRandomGif(
             @RequestParam("api_key") String apiKey,
