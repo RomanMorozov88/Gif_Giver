@@ -30,6 +30,7 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
     private String appId;
     @Value("${openexchangerates.base}")
     private String base;
+    private final Integer period = -2;
 
     @Autowired
     public OpenExchangeRatesServiceImpl(
@@ -43,24 +44,23 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
     }
 
     /**
-     * Перед выполнением проводит проверку текущих курсов-
-     * т.к. тут актуальность курсов не важна- то обновляет курсы только при отсутствии
-     * текущих курсов.
      * Возвращает список доступных для проверки валют.
      *
      * @return
      */
     @Override
     public List<String> getCharCodes() {
-        if (this.currentRates == null) {
-            this.refreshRates();
+        List<String> result = null;
+        if (this.currentRates.getRates() != null) {
+            result = new ArrayList<>(this.currentRates.getRates().keySet());
         }
-        return new ArrayList<>(this.currentRates.getRates().keySet());
+        return result;
     }
 
     /**
+     * Проверяет\обновляет курсы,
      * Возвращает результат сравнения коэфициентов.
-     * Если коэфициентов нет- возвращает 0.
+     * Если курсов или коэфициентов нет- возвращает -101.
      *
      * @param charCode
      * @return
@@ -78,7 +78,8 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
     /**
      * Проверка\обновление курсов.
      */
-    private void refreshRates() {
+    @Override
+    public void refreshRates() {
         long currentTime = System.currentTimeMillis();
         this.refreshCurrentRates(currentTime);
         this.refreshPrevRates(currentTime);
@@ -105,14 +106,15 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
      * Обновление вчерашних курсов.
      * Проверяется время с точностью до дня.
      * При запросе к openexchangerates.org//historical/*
-     * Приходят данные, отличные на день- потому при настройке календаря стоит -2
+     * Приходят данные, отличные на день- потому значение period должно быть
+     * установлено как -2 для получения курсов на день раньше от текущей даты.
      *
      * @param time
      */
     private void refreshPrevRates(long time) {
         Calendar prevCalendar = Calendar.getInstance();
         prevCalendar.setTimeInMillis(time);
-        prevCalendar.add(Calendar.DAY_OF_YEAR, -2);
+        prevCalendar.add(Calendar.DAY_OF_YEAR, this.period);
         String newPrevDate = dateFormat.format(prevCalendar.getTime());
         if (
                 this.prevRates == null ||
@@ -132,10 +134,18 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
      * @param charCode
      */
     private Double getCoefficient(ExchangeRates rates, String charCode) {
-        Map<String, Double> map = rates.getRates();
-        Double targetRate = map.get(charCode);
-        return targetRate != null
-                ? (map.get(this.prevRates.getBase()) / map.get(this.base)) * targetRate
+        Double targetRate = null;
+        Double appBaseRate = null;
+        Double defaultBaseRate = null;
+        Map<String, Double> map = null;
+        if (rates != null && rates.getRates() != null) {
+            map = rates.getRates();
+            targetRate = map.get(charCode);
+            appBaseRate = map.get(this.base);
+            defaultBaseRate = map.get(rates.getBase());
+        }
+        return targetRate != null && appBaseRate != null
+                ? (defaultBaseRate / appBaseRate) * targetRate
                 : null;
     }
 

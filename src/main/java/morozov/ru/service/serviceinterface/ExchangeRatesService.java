@@ -8,4 +8,6 @@ public interface ExchangeRatesService {
 
     int getKeyForTag(String charCode);
 
+    void refreshRates();
+
 }

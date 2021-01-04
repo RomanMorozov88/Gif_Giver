@@ -50,10 +50,6 @@ public class MainController {
     /**
      * Получает гифку для отправки клиенту
      * исходя из резултата сравнения курса в openExchangeRatesService
-     * Ответ от Giphy.com просто перекидывается клиенту
-     * в виде ResponseEntity
-     * лишь с небольшой модификацией- добавляется compareResult
-     * для удобства визуальной проверки результата.
      *
      * @param code
      * @return
@@ -61,28 +57,23 @@ public class MainController {
     @GetMapping("/getgif/{code}")
     public ResponseEntity<Map> getGif(@PathVariable String code) {
         ResponseEntity<Map> result = null;
-        int gifKey = 0;
+        int gifKey = -101;
+        String gifTag = this.errorTag;
         if (code != null) {
             gifKey = exchangeRatesService.getKeyForTag(code);
         }
         switch (gifKey) {
             case 1:
-                result = gifService.getGif(this.richTag);
-                result.getBody().put("compareResult", this.richTag);
+                gifTag = this.richTag;
                 break;
             case -1:
-                result = gifService.getGif(this.brokeTag);
-                result.getBody().put("compareResult", this.brokeTag);
+                gifTag = this.brokeTag;
                 break;
             case 0:
-                result = gifService.getGif(this.whatTag);
-                result.getBody().put("compareResult", this.whatTag);
-                break;
-            default:
-                result = gifService.getGif(this.errorTag);
-                result.getBody().put("compareResult", this.errorTag);
+                gifTag = this.whatTag;
                 break;
         }
+        result = gifService.getGif(gifTag);
         return result;
     }
 

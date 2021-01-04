@@ -1,4 +1,5 @@
-const general_url = 'http://localhost:8080/gg/';
+//url относительно хоста. Можно поменять порт в application.properties и всё будет работать.
+const general_url = './gg/';
 
 
 //Отправляет запрос для получения гифки.
