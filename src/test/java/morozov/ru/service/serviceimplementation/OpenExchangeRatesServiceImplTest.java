@@ -42,6 +42,9 @@ public class OpenExchangeRatesServiceImplTest {
      * T2 - уменьшается.
      * T3 - увеличивается.
      * База приложения и база-по-умолчанию не меняются.
+     * База приложения имеет значения 73.108
+     * и 73.945(в последнем тесте, где значение базы для currentRates меняется)
+     * т.к. при таких значениях без округления возможен результат 1.0 и 0.99999999...
      */
     @Before
     public void init() {
@@ -53,7 +56,7 @@ public class OpenExchangeRatesServiceImplTest {
         currentRatesMap.put("T1", 0.1);
         currentRatesMap.put("T2", 0.5);
         currentRatesMap.put("T3", 1.0);
-        currentRatesMap.put(base, 0.2);
+        currentRatesMap.put(this.base, 73.108);
         currentRatesMap.put("T_BASE", 1.0);
         this.currentRates.setRates(currentRatesMap);
 
@@ -65,7 +68,7 @@ public class OpenExchangeRatesServiceImplTest {
         prevRatesMap.put("T1", 0.1);
         prevRatesMap.put("T2", 1.0);
         prevRatesMap.put("T3", 0.5);
-        prevRatesMap.put(base, 0.2);
+        prevRatesMap.put(this.base, 73.108);
         prevRatesMap.put("T_BASE", 1.0);
         this.prevRates.setRates(prevRatesMap);
 
@@ -166,7 +169,7 @@ public class OpenExchangeRatesServiceImplTest {
 
     @Test
     public void whenAppBaseIsChanged() {
-        this.currentRates.getRates().put(this.base, 2.333333);
+        this.currentRates.getRates().put(this.base, 73.945);
         Mockito.when(openExchangeRatesClient.getLatestRates(anyString()))
                 .thenReturn(this.currentRates);
         Mockito.when(openExchangeRatesClient.getHistoricalRates(anyString(), anyString()))

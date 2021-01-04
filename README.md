@@ -38,7 +38,7 @@ GET /gg/getgif/{Char Code}
 Запуск .jar:
 ---
 ```
-java -jar gg.jar
+java -jar gg-0.0.1.jar
 ```
 Docker:
 ---

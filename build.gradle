@@ -16,6 +16,15 @@ java {
 version = '0.0.1'
 mainClassName = 'morozov.ru.MainClass'
 
+task copyJarToRoot {
+    doLast {
+        copy {
+            from './build/libs/gif_giver-0.0.1.jar'
+            into "./"
+        }
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -28,7 +37,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation  'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 }
 
 dependencyManagement {

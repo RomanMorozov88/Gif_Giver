@@ -1,8 +1,9 @@
 FROM openjdk:11
 
-# port exposed
 EXPOSE 8080
 
-ADD gg.jar .
+RUN mkdir ./app
 
-CMD java -jar gg.jar
+COPY ./gif_giver-0.0.1.jar ./app
+
+CMD java -jar ./app/gif_giver-0.0.1.jar

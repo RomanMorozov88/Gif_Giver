@@ -131,6 +131,7 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
      * Формула для подсчётка коэфициента по отношению к установленной в этом приложении валютной базе.
      * (Default_Base / Our_Base) * Target
      * Если на входе оказался несуществующий charCode- то вернёт null
+     * Так же при подсчёте результата происходит округление курса до четырёх знаков после запятой.
      *
      * @param rates
      * @param charCode
@@ -148,22 +149,13 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
             defaultBaseRate = map.get(rates.getBase());
         }
         if (targetRate != null && appBaseRate != null && defaultBaseRate != null) {
-            targetRate = this.roundRate(targetRate);
-            appBaseRate = this.roundRate(appBaseRate);
-            defaultBaseRate = this.roundRate(defaultBaseRate);
-            result = (defaultBaseRate / appBaseRate) * targetRate;
+            result = new BigDecimal(
+                    (defaultBaseRate / appBaseRate) * targetRate
+            )
+                    .setScale(4, RoundingMode.UP)
+                    .doubleValue();
         }
         return result;
-    }
-
-    /**
-     * Округление курса до двух знаков после запятой.
-     *
-     * @param rate
-     * @return
-     */
-    private double roundRate(double rate) {
-        return new BigDecimal(rate).setScale(2, RoundingMode.UP).doubleValue();
     }
 
 }
