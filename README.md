@@ -29,4 +29,8 @@ GET /gg/getcodes
 (пример ответа: https://api.giphy.com/v1/gifs/random?api_key=R4DaQAgkZAVHt8At21gcVjGshLrHeThw&tag=rich):
 ```
 GET /gg/getgif/{Char Code}
-```
+```  
+Создание образа Docker:  
+docker build {имя образа}:{тэг} .  
+Запуск:  
+docker run -p 8080:8080 {имя образа}:{тэг}
