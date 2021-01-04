@@ -164,4 +164,15 @@ public class OpenExchangeRatesServiceImplTest {
         assertEquals(-101, result);
     }
 
+    @Test
+    public void whenAppBaseIsChanged() {
+        this.currentRates.getRates().put(this.base, 2.333333);
+        Mockito.when(openExchangeRatesClient.getLatestRates(anyString()))
+                .thenReturn(this.currentRates);
+        Mockito.when(openExchangeRatesClient.getHistoricalRates(anyString(), anyString()))
+                .thenReturn(this.prevRates);
+        int result = exchangeRatesService.getKeyForTag(this.base);
+        assertEquals(0, result);
+    }
+
 }

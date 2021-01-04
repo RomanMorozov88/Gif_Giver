@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -134,6 +136,7 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
      * @param charCode
      */
     private Double getCoefficient(ExchangeRates rates, String charCode) {
+        Double result = null;
         Double targetRate = null;
         Double appBaseRate = null;
         Double defaultBaseRate = null;
@@ -144,9 +147,23 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
             appBaseRate = map.get(this.base);
             defaultBaseRate = map.get(rates.getBase());
         }
-        return targetRate != null && appBaseRate != null
-                ? (defaultBaseRate / appBaseRate) * targetRate
-                : null;
+        if (targetRate != null && appBaseRate != null && defaultBaseRate != null) {
+            targetRate = this.roundRate(targetRate);
+            appBaseRate = this.roundRate(appBaseRate);
+            defaultBaseRate = this.roundRate(defaultBaseRate);
+            result = (defaultBaseRate / appBaseRate) * targetRate;
+        }
+        return result;
+    }
+
+    /**
+     * Округление курса до двух знаков после запятой.
+     *
+     * @param rate
+     * @return
+     */
+    private double roundRate(double rate) {
+        return new BigDecimal(rate).setScale(2, RoundingMode.UP).doubleValue();
     }
 
 }

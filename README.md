@@ -1,3 +1,5 @@
+Описание:
+---
 ```
 Создать сервис, который обращается к сервису курсов валют, и отдает gif в ответ:  
 
@@ -19,8 +21,9 @@ Must Have
 Результатом выполнения должен быть репо на GitHub с инструкцией по запуску  
 Nice to Have  
 Сборка и запуск Docker контейнера с этим сервисом
-```
-
+```  
+Endpoints:
+---  
 Получить список кодов для валют:  
 ```
 GET /gg/getcodes
@@ -30,7 +33,29 @@ GET /gg/getcodes
 ```
 GET /gg/getgif/{Char Code}
 ```  
-Создание образа Docker:  
-docker build {имя образа}:{тэг} .  
-Запуск:  
-docker run -p 8080:8080 {имя образа}:{тэг}
+Простой html+js доступен по localhost:8080/  
+ 
+Запуск .jar:
+---
+```
+java -jar gg.jar
+```
+Docker:
+---
+Для создания образа Docker перейти в корневую директорию проекта,  
+где лежит фаил Dockerfile:  
+```  
+docker build gif_giver_image:gg .  
+```
+Запуск:   
+```
+docker run -p 8080:8080 gif_giver_image:gg 
+``` 
+Или получить образ с DockerHub:  
+```
+docker pull morozovroman/gif_giver:latest 
+```
+Запуск: 
+``` 
+docker run -p 8080:8080 --name gifgiver morozovroman/gif_giver:latest
+```
