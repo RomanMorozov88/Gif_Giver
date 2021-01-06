@@ -32,7 +32,7 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
     private String appId;
     @Value("${openexchangerates.base}")
     private String base;
-    private final Integer period = -2;
+    private final Integer period = -1;
 
     @Autowired
     public OpenExchangeRatesServiceImpl(
@@ -108,8 +108,6 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
      * Обновление вчерашних курсов.
      * Проверяется время с точностью до дня.
      * При запросе к openexchangerates.org//historical/*
-     * Приходят данные, отличные на день- потому значение period должно быть
-     * установлено как -2 для получения курсов на день раньше от текущей даты.
      *
      * @param time
      */
