@@ -32,7 +32,6 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
     private String appId;
     @Value("${openexchangerates.base}")
     private String base;
-    private final Integer period = -1;
 
     @Autowired
     public OpenExchangeRatesServiceImpl(
@@ -107,19 +106,29 @@ public class OpenExchangeRatesServiceImpl implements ExchangeRatesService {
     /**
      * Обновление вчерашних курсов.
      * Проверяется время с точностью до дня.
-     * При запросе к openexchangerates.org//historical/*
+     * Так же, что бы при каждом запросе не приходилось обращаться к внешнему сервису
+     * для обновления курсов- происходит проверка даты текущего prevRates
+     * с приведённым к строковому виду YYYY-MM-DD текущей и меньшей на день от текущей дат,
+     * т.к. при запросе к к openexchangerates.org//historical/* с указанием
+     * вчерашней даты могут вернуться
+     * курсы с датой, равной текущей.
      *
      * @param time
      */
     private void refreshPrevRates(long time) {
         Calendar prevCalendar = Calendar.getInstance();
         prevCalendar.setTimeInMillis(time);
-        prevCalendar.add(Calendar.DAY_OF_YEAR, this.period);
+        String currentDate = dateFormat.format(prevCalendar.getTime());
+        prevCalendar.add(Calendar.DAY_OF_YEAR, -1);
         String newPrevDate = dateFormat.format(prevCalendar.getTime());
         if (
-                this.prevRates == null ||
+                this.prevRates == null
+                        || (
                         !dateFormat.format(Long.valueOf(this.prevRates.getTimestamp()) * 1000)
                                 .equals(newPrevDate)
+                                && !dateFormat.format(Long.valueOf(this.prevRates.getTimestamp()) * 1000)
+                                .equals(currentDate)
+                )
         ) {
             this.prevRates = openExchangeRatesClient.getHistoricalRates(newPrevDate, appId);
         }
